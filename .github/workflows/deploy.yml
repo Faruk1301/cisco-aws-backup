@@ -24,16 +24,23 @@ jobs:
 
       - name: Terraform Init
         id: init
+        # এখানে ব্যাকেন্ড কনফিগারের জন্য সিক্রেটগুলো সরাসরি ইনজেক্ট করা হয়েছে
         run: |
           terraform init \
             -backend-config="access_key=${{ secrets.AWS_ACCESS_KEY_ID }}" \
-            -backend-config="secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
-            -backend-config="region=us-east-1"
+            -backend-config="secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}"
 
       - name: Terraform Plan
         id: plan
         run: terraform plan -no-color
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
+        # অ্যাপ্লাই স্টেপেও এনভায়রনমেন্ট ভেরিয়েবল নিশ্চিত করা হয়েছে
         run: terraform apply -auto-approve
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

@@ -3,7 +3,8 @@ terraform {
     bucket         = "faruk-terraform-lab-001"
     key            = "cisco-router/terraform.tfstate"
     region         = "us-east-1"
-    dynamodb_table = "terraform-lock"
     encrypt        = true
+    # dynamodb_table ওয়ার্নিং সরাতে এবং এরর কমাতে আপাতত এটি বাদ রাখছি
+    # যদি পরে দরকার হয় আমরা 'use_lockfile = true' ব্যবহার করবো
   }
 }
