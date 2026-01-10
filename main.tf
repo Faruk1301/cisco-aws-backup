@@ -2,7 +2,7 @@ provider "aws" {
   region = "us-east-1"
 }
 
-# ১. নতুন VPC তৈরি
+# ১. নেটওয়ার্ক তৈরি (VPC)
 resource "aws_vpc" "cisco_vpc" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_hostnames = true
@@ -13,7 +13,7 @@ resource "aws_vpc" "cisco_vpc" {
   }
 }
 
-# ২. ইন্টারনেট গেটওয়ে (ইন্টারনেট কানেকশনের জন্য)
+# ২. ইন্টারনেট গেটওয়ে
 resource "aws_internet_gateway" "cisco_igw" {
   vpc_id = aws_vpc.cisco_vpc.id
 
@@ -26,14 +26,14 @@ resource "aws_internet_gateway" "cisco_igw" {
 resource "aws_subnet" "cisco_subnet" {
   vpc_id                  = aws_vpc.cisco_vpc.id
   cidr_block              = "10.0.1.0/24"
-  map_public_ip_on_launch = true # যাতে রাউটার পাবলিক আইপি পায়
+  map_public_ip_on_launch = true
 
   tags = {
     Name = "Faruk-Cisco-Subnet"
   }
 }
 
-# ৪. রাউট টেবিল (ইন্টারনেটে ট্রাফিক পাঠানোর জন্য)
+# ৪. রাউট টেবিল সেটআপ
 resource "aws_route_table" "cisco_rt" {
   vpc_id = aws_vpc.cisco_vpc.id
 
@@ -43,13 +43,12 @@ resource "aws_route_table" "cisco_rt" {
   }
 }
 
-# ৫. সাবনেটের সাথে রাউট টেবিল কানেক্ট করা
 resource "aws_route_table_association" "cisco_rta" {
   subnet_id      = aws_subnet.cisco_subnet.id
   route_table_id = aws_route_table.cisco_rt.id
 }
 
-# ৬. সিকিউরিটি গ্রুপ (VPC ID সহ আপডেট করা)
+# ৫. সিকিউরিটি গ্রুপ (ডেসক্রিপশন এরর ফিক্স করা)
 resource "aws_security_group" "cisco_sg" {
   name        = "cisco-automation-sg"
   description = "Allow SSH and HTTP for Cisco Lab"
@@ -70,12 +69,12 @@ resource "aws_security_group" "cisco_sg" {
   }
 }
 
-# ৭. সিসকো রাউটার তৈরি
+# ৬. সিসকো রাউটার তৈরি (AMI আইডি আপডেট করা)
 resource "aws_instance" "cisco_router" {
-  ami           = "ami-0da63914a1e9ca467" 
+  ami           = "ami-0560938f825227d86" 
   instance_type = "t3.medium"
   
-  # আপনার সঠিক কী-পেয়ার এর নাম দিন, অথবা এটি আপাতত কমেন্ট করে রাখতে পারেন
+  # যদি আপনার AWS এ কোনো Key Pair থাকে তবে নাম দিন, নাহলে এটি এভাবেই রাখুন
   # key_name      = "your-key-name" 
 
   subnet_id              = aws_subnet.cisco_subnet.id
@@ -86,6 +85,7 @@ resource "aws_instance" "cisco_router" {
   }
 }
 
+# ৭. রাউটারের পাবলিক আইপি আউটপুট
 output "router_ip" {
   value = aws_instance.cisco_router.public_ip
 }
