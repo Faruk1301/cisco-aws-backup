@@ -52,7 +52,7 @@ resource "aws_route_table_association" "cisco_rta" {
 # ৬. সিকিউরিটি গ্রুপ (VPC ID সহ আপডেট করা)
 resource "aws_security_group" "cisco_sg" {
   name        = "cisco-automation-sg"
-  description = "Allow SSH for Faruk's Project"
+  description = "Allow SSH and HTTP for Cisco Lab"
   vpc_id      = aws_vpc.cisco_vpc.id
 
   ingress {
