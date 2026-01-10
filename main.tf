@@ -4,10 +4,16 @@ provider "aws" {
 
 data "aws_ami" "cisco_img" {
   most_recent = true
-  owners      = ["679593333241"]
+  owners      = ["679593333241"] # Cisco Official Owner
+
   filter {
     name   = "name"
-    values = ["*Cisco*Catalyst*8000V*"]
+    values = ["cisco-C8K*"] # 'C8K' মানেই Catalyst 8000V, এটা অবশ্যই খুঁজে পাবে
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
   }
 }
 
