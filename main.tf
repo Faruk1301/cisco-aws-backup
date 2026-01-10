@@ -2,21 +2,7 @@ provider "aws" {
   region = "us-east-1"
 }
 
-data "aws_ami" "cisco_img" {
-  most_recent = true
-  owners      = ["679593333241"] # Cisco Official Owner
-
-  filter {
-    name   = "name"
-    values = ["cisco-C8K*"] # 'C8K' মানেই Catalyst 8000V, এটা অবশ্যই খুঁজে পাবে
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-}
-
+# ১. VPC এবং নেটওয়ার্ক সেটআপ
 resource "aws_vpc" "cisco_vpc" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_hostnames = true
@@ -49,8 +35,9 @@ resource "aws_route_table_association" "cisco_rta" {
   route_table_id = aws_route_table.cisco_rt.id
 }
 
+# ২. সিকিউরিটি গ্রুপ
 resource "aws_security_group" "cisco_sg" {
-  name        = "cisco-lab-sg-new"
+  name        = "cisco-lab-sg-final"
   description = "Cisco Lab SG"
   vpc_id      = aws_vpc.cisco_vpc.id
   ingress {
@@ -67,12 +54,16 @@ resource "aws_security_group" "cisco_sg" {
   }
 }
 
+# ৩. সিসকো রাউটার তৈরি (সরাসরি লেটেস্ট AMI ID ব্যবহার করছি)
 resource "aws_instance" "cisco_router" {
-  ami                    = data.aws_ami.cisco_img.id
-  instance_type          = "t3.medium"
+  # এটি Cisco Catalyst 8000V - IOS XE 17.12.01a (us-east-1 এর জন্য)
+  ami           = "ami-0b92f75a999238861"
+  instance_type = "t3.medium"
+
   subnet_id              = aws_subnet.cisco_subnet.id
   vpc_security_group_ids = [aws_security_group.cisco_sg.id]
-  tags                   = { Name = "Faruk-Cisco-Router" }
+
+  tags = { Name = "Faruk-Cisco-Router" }
 }
 
 output "router_ip" {
