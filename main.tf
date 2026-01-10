@@ -71,8 +71,8 @@ resource "aws_security_group" "cisco_sg" {
 
 # ৬. সিসকো রাউটার তৈরি (AMI আইডি আপডেট করা)
 resource "aws_instance" "cisco_router" {
-  ami           = "ami-0560938f825227d86" 
-  instance_type = "t3.medium"
+  ami             = "ami-0b92f75a999238861"
+  instance_type   = "t3.medium"
   
   # যদি আপনার AWS এ কোনো Key Pair থাকে তবে নাম দিন, নাহলে এটি এভাবেই রাখুন
   # key_name      = "your-key-name" 
